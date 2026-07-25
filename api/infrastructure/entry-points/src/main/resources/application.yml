@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: prestamos-facil-api
+
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/freepdb1
+    username: prestamos_user
+    password: prestamos_pass
+    driver-class-name: oracle.jdbc.OracleDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8080
