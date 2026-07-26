@@ -7,11 +7,14 @@ import com.prestamosfacil.application.validation.ValidadorPlazoDentroDeRango;
 import com.prestamosfacil.application.validation.ValidadorSolicitud;
 import com.prestamosfacil.application.validation.ValidadorTipoPrestamoActivo;
 import com.prestamosfacil.enums.EstadoSolicitud;
+import com.prestamosfacil.exception.SolicitudInvalidaException;
 import com.prestamosfacil.exception.TipoPrestamoNoEncontradoException;
 import com.prestamosfacil.exception.UsuarioNoEncontradoException;
 import com.prestamosfacil.model.SolicitudPrestamo;
 import com.prestamosfacil.model.TipoPrestamo;
 import com.prestamosfacil.model.Usuario;
+import com.prestamosfacil.model.pagination.Paginacion;
+import com.prestamosfacil.model.pagination.ResultadoPaginado;
 import com.prestamosfacil.ports.ISolicitudPrestamoPersistencePort;
 import com.prestamosfacil.ports.ITipoPrestamoPersistencePort;
 import com.prestamosfacil.ports.IUsuarioPersistencePort;
@@ -19,6 +22,7 @@ import com.prestamosfacil.ports.IUsuarioPersistencePort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,5 +58,39 @@ public class SolicitudPrestamoUseCase implements ISolicitudPrestamoPort {
                 EstadoSolicitud.PENDIENTE_REVISION, null, LocalDateTime.now(), null);
 
         return solicitudPrestamoPersistencePort.guardar(solicitud);
+    }
+
+    @Override
+    public ResultadoPaginado<SolicitudPrestamo> listarPorEstado(EstadoSolicitud estadoOpcional,
+                                                                 Paginacion paginacion) {
+        return solicitudPrestamoPersistencePort.listarPorEstado(estadoOpcional, paginacion);
+    }
+
+    @Override
+    public ResultadoPaginado<SolicitudPrestamo> listarPorFecha(LocalDate fechaDesdeOpcional,
+                                                                LocalDate fechaHastaOpcional, Paginacion paginacion) {
+        if (fechaDesdeOpcional == null) {
+            throw new SolicitudInvalidaException("La fecha desde es obligatoria");
+        }
+
+        if (fechaHastaOpcional == null) {
+            throw new SolicitudInvalidaException("La fecha hasta es obligatoria");
+        }
+
+        LocalDate hoy = LocalDate.now();
+
+        if (fechaDesdeOpcional.isAfter(hoy)) {
+            throw new SolicitudInvalidaException("La fecha desde no puede ser posterior a la fecha actual");
+        }
+
+        if (fechaHastaOpcional.isAfter(hoy)) {
+            throw new SolicitudInvalidaException("La fecha hasta no puede ser posterior a la fecha actual");
+        }
+
+        if (fechaDesdeOpcional.isAfter(fechaHastaOpcional)) {
+            throw new SolicitudInvalidaException("La fecha desde no puede ser posterior a la fecha hasta");
+        }
+
+        return solicitudPrestamoPersistencePort.listarPorFecha(fechaDesdeOpcional, fechaHastaOpcional, paginacion);
     }
 }

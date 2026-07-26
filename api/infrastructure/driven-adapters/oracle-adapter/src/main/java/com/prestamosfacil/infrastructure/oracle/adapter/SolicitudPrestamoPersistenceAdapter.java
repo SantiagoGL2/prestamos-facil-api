@@ -13,9 +13,9 @@ import com.prestamosfacil.ports.ISolicitudPrestamoPersistencePort;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Component
@@ -56,15 +56,29 @@ public class SolicitudPrestamoPersistenceAdapter implements ISolicitudPrestamoPe
     }
 
     @Override
-    public ResultadoPaginado<SolicitudPrestamo> listarPaginado(EstadoSolicitud estadoOpcional,
-                                                                Paginacion paginacion) {
-        Specification<SolicitudPrestamoEntity> specification = Specification.where(estadoOpcional == null
-                ? null
-                : (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("estado"), estadoOpcional));
+    public ResultadoPaginado<SolicitudPrestamo> listarPorEstado(EstadoSolicitud estadoOpcional,
+                                                                 Paginacion paginacion) {
+        PageRequest pageRequest = PageRequest.of(paginacion.pagina(), paginacion.tamano());
 
-        Page<SolicitudPrestamoEntity> pagina = solicitudPrestamoRepository.findAll(specification,
+        Page<SolicitudPrestamoEntity> pagina = estadoOpcional == null
+                ? solicitudPrestamoRepository.findAll(pageRequest)
+                : solicitudPrestamoRepository.findByEstado(estadoOpcional, pageRequest);
+
+        return mapearPagina(pagina);
+    }
+
+    @Override
+    public ResultadoPaginado<SolicitudPrestamo> listarPorFecha(LocalDate fechaDesdeOpcional,
+                                                                LocalDate fechaHastaOpcional,
+                                                                Paginacion paginacion) {
+        Page<SolicitudPrestamoEntity> pagina = solicitudPrestamoRepository.findByFechaSolicitudBetween(
+                fechaDesdeOpcional.atStartOfDay(), fechaHastaOpcional.atTime(23, 59, 59),
                 PageRequest.of(paginacion.pagina(), paginacion.tamano()));
 
+        return mapearPagina(pagina);
+    }
+
+    private ResultadoPaginado<SolicitudPrestamo> mapearPagina(Page<SolicitudPrestamoEntity> pagina) {
         return new ResultadoPaginado<>(
                 pagina.getContent().stream().map(solicitudPrestamoEntityMapper::toDomain).toList(),
                 pagina.getTotalElements(), pagina.getTotalPages(), pagina.getNumber());

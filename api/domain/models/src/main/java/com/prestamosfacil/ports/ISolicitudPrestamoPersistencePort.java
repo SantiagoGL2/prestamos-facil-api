@@ -5,6 +5,7 @@ import com.prestamosfacil.model.pagination.Paginacion;
 import com.prestamosfacil.model.pagination.ResultadoPaginado;
 import com.prestamosfacil.enums.EstadoSolicitud;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 public interface ISolicitudPrestamoPersistencePort {
@@ -13,5 +14,8 @@ public interface ISolicitudPrestamoPersistencePort {
 
     Optional<SolicitudPrestamo> buscarPorId(Long id);
 
-    ResultadoPaginado<SolicitudPrestamo> listarPaginado(EstadoSolicitud estadoOpcional, Paginacion paginacion);
+    ResultadoPaginado<SolicitudPrestamo> listarPorEstado(EstadoSolicitud estadoOpcional, Paginacion paginacion);
+
+    ResultadoPaginado<SolicitudPrestamo> listarPorFecha(LocalDate fechaDesdeOpcional, LocalDate fechaHastaOpcional,
+                                                         Paginacion paginacion);
 }
