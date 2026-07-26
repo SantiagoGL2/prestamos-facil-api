@@ -12,5 +12,9 @@ public interface IUsuarioPersistencePort {
 
     Optional<Usuario> buscarPorEmail(String email);
 
+    Optional<Usuario> buscarPorTipoDocumentoYNumeroDocumento(Long tipoDocumentoId, String numeroDocumento);
+
     boolean existeEmail(String email);
+
+    boolean existeTipoDocumentoYNumeroDocumento(Long tipoDocumentoId, String numeroDocumento);
 }
