@@ -51,6 +51,10 @@ public class TipoPrestamoEntity {
     @ToString.Include
     private BigDecimal montoMax;
 
+    @Column(name = "plazo_min_meses", precision = 4, nullable = false)
+    @ToString.Include
+    private Integer plazoMinMeses;
+
     @Column(name = "plazo_max_meses", precision = 4, nullable = false)
     @ToString.Include
     private Integer plazoMaxMeses;
@@ -60,12 +64,14 @@ public class TipoPrestamoEntity {
     private boolean activo;
 
     public TipoPrestamoEntity(String nombre, BigDecimal tasaInteresAnual, boolean validacionAutomatica,
-                               BigDecimal montoMin, BigDecimal montoMax, Integer plazoMaxMeses, boolean activo) {
+                               BigDecimal montoMin, BigDecimal montoMax, Integer plazoMinMeses, Integer plazoMaxMeses,
+                               boolean activo) {
         this.nombre = nombre;
         this.tasaInteresAnual = tasaInteresAnual;
         this.validacionAutomatica = validacionAutomatica;
         this.montoMin = montoMin;
         this.montoMax = montoMax;
+        this.plazoMinMeses = plazoMinMeses;
         this.plazoMaxMeses = plazoMaxMeses;
         this.activo = activo;
     }
