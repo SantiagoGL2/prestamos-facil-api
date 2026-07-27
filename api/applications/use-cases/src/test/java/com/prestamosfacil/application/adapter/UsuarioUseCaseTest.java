@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static com.prestamosfacil.application.mocks.PrestamoFacilMocks.getMockUsuarioAnalista;
@@ -139,5 +140,47 @@ class UsuarioUseCaseTest {
         when(usuarioPersistencePort.buscarPorId(99L)).thenReturn(Optional.empty());
 
         assertThrows(UsuarioNoEncontradoException.class, () -> usuarioUseCase.buscarPorId(99L));
+    }
+
+    @Test
+    void buscarPorTipoDocumentoYNumeroDocumentoRetornaElUsuarioCuandoExiste() {
+        Usuario usuario = getMockUsuarioCliente();
+        when(usuarioPersistencePort.buscarPorTipoDocumentoYNumeroDocumento(1L, "123"))
+                .thenReturn(Optional.of(usuario));
+
+        Usuario resultado = usuarioUseCase.buscarPorTipoDocumentoYNumeroDocumento(1L, "123");
+
+        assertEquals(usuario, resultado);
+    }
+
+    @Test
+    void buscarPorTipoDocumentoYNumeroDocumentoLanzaExcepcionCuandoNoExiste() {
+        when(usuarioPersistencePort.buscarPorTipoDocumentoYNumeroDocumento(1L, "999"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(UsuarioNoEncontradoException.class,
+                () -> usuarioUseCase.buscarPorTipoDocumentoYNumeroDocumento(1L, "999"));
+    }
+
+    @Test
+    void listarClientesDelegaEnElPersistencePortConRolCliente() {
+        Usuario cliente = getMockUsuarioCliente();
+        when(usuarioPersistencePort.listarPorRol(RolUsuario.CLIENTE)).thenReturn(List.of(cliente));
+
+        List<Usuario> resultado = usuarioUseCase.listarClientes();
+
+        assertEquals(List.of(cliente), resultado);
+        verify(usuarioPersistencePort).listarPorRol(RolUsuario.CLIENTE);
+    }
+
+    @Test
+    void listarAnalistasDelegaEnElPersistencePortConRolAnalista() {
+        Usuario analista = getMockUsuarioAnalista();
+        when(usuarioPersistencePort.listarPorRol(RolUsuario.ANALISTA)).thenReturn(List.of(analista));
+
+        List<Usuario> resultado = usuarioUseCase.listarAnalistas();
+
+        assertEquals(List.of(analista), resultado);
+        verify(usuarioPersistencePort).listarPorRol(RolUsuario.ANALISTA);
     }
 }
