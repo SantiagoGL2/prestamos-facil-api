@@ -1,6 +1,7 @@
 package com.prestamosfacil.ports;
 
 import com.prestamosfacil.model.Prestamo;
+import com.prestamosfacil.model.ReportePrestamoAprobado;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,5 +14,5 @@ public interface IPrestamoPersistencePort {
 
     List<Prestamo> listarActivos();
 
-    List<Prestamo> listarAprobados();
+    List<ReportePrestamoAprobado> listarAprobados();
 }

@@ -19,6 +19,10 @@ public class RabbitMQConfig {
     public static final String QUEUE_USUARIO_REGISTRADO = "notificaciones.usuario-registrado.queue";
     public static final String ROUTING_KEY_USUARIO_REGISTRADO = "usuario.registrado";
 
+    public static final String REPORTES_EXCHANGE = "reportes.exchange";
+    public static final String QUEUE_REPORTE_ENVIO = "reportes.envio.queue";
+    public static final String ROUTING_KEY_REPORTE_SOLICITADO = "reporte.solicitado";
+
     @Bean
     public TopicExchange notificacionesExchange() {
         return new TopicExchange(EXCHANGE);
@@ -44,6 +48,21 @@ public class RabbitMQConfig {
     public Binding usuarioRegistradoBinding(Queue usuarioRegistradoQueue, TopicExchange notificacionesExchange) {
         return BindingBuilder.bind(usuarioRegistradoQueue).to(notificacionesExchange)
                 .with(ROUTING_KEY_USUARIO_REGISTRADO);
+    }
+
+    @Bean
+    public TopicExchange reportesExchange() {
+        return new TopicExchange(REPORTES_EXCHANGE);
+    }
+
+    @Bean
+    public Queue reporteEnvioQueue() {
+        return new Queue(QUEUE_REPORTE_ENVIO);
+    }
+
+    @Bean
+    public Binding reporteEnvioBinding(Queue reporteEnvioQueue, TopicExchange reportesExchange) {
+        return BindingBuilder.bind(reporteEnvioQueue).to(reportesExchange).with(ROUTING_KEY_REPORTE_SOLICITADO);
     }
 
     @Bean

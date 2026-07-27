@@ -6,6 +6,7 @@ import com.prestamosfacil.infrastructure.oracle.mapper.PrestamoEntityMapper;
 import com.prestamosfacil.infrastructure.oracle.repository.IPrestamoRepository;
 import com.prestamosfacil.infrastructure.oracle.repository.ISolicitudPrestamoRepository;
 import com.prestamosfacil.model.Prestamo;
+import com.prestamosfacil.model.ReportePrestamoAprobado;
 import com.prestamosfacil.ports.IPrestamoPersistencePort;
 
 import org.springframework.stereotype.Component;
@@ -51,9 +52,7 @@ public class PrestamoPersistenceAdapter implements IPrestamoPersistencePort {
     }
 
     @Override
-    public List<Prestamo> listarAprobados() {
-        return prestamoRepository.findAll().stream()
-                .map(prestamoEntityMapper::toDomain)
-                .toList();
+    public List<ReportePrestamoAprobado> listarAprobados() {
+        return prestamoRepository.listarReporteAprobados();
     }
 }

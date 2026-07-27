@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Reporte de Préstamos Aprobados</title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #333333; font-size: 12px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header img { width: 130px; }
+    h1 { color: #005a9c; font-size: 18px; }
+    table.prestamos { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table.prestamos th { background-color: #005a9c; color: #ffffff; padding: 6px; text-align: right; font-size: 11px; }
+    table.prestamos th:first-child { text-align: left; }
+    table.prestamos td { padding: 5px 6px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px; }
+    table.prestamos td:first-child { text-align: left; }
+    table.prestamos tr:nth-child(even) { background-color: #f8fafc; }
+    .total { margin-top: 20px; padding: 12px 16px; background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; text-align: right; font-size: 14px; font-weight: bold; color: #005a9c; }
+    .footer { margin-top: 20px; font-size: 10px; color: #64748b; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img th:src="'data:image/png;base64,' + ${logoBase64}" alt="Préstamos Fácil"/>
+    <h1>Reporte de Préstamos Aprobados</h1>
+  </div>
+  <table class="prestamos">
+    <thead>
+      <tr><th>Tipo de Crédito</th><th>Fecha de Solicitud</th><th>Plazo</th><th>Monto Aprobado</th></tr>
+    </thead>
+    <tbody>
+      <tr th:each="prestamo : ${prestamos}">
+        <td th:text="${prestamo.tipoPrestamoNombre()}">Tipo</td>
+        <td th:text="${prestamo.fechaSolicitud()}">Fecha</td>
+        <td th:text="${prestamo.plazoMeses()}">Plazo</td>
+        <td th:text="${prestamo.montoAprobado()}">Monto</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="total">
+    <span th:text="'Total acumulado aprobado: ' + ${montoTotalAprobado}">Total acumulado aprobado: 0</span>
+  </div>
+  <div class="footer"><p>Préstamos Fácil © 2026 — Este documento es generado automáticamente.</p></div>
+</body>
+</html>

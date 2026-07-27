@@ -3,6 +3,7 @@ package com.prestamosfacil.infrastructure.rabbitmq.email;
 import com.prestamosfacil.infrastructure.rabbitmq.pdf.GeneradorPdfPlanPagos;
 import com.prestamosfacil.model.NotificacionRegistroEvento;
 import com.prestamosfacil.model.NotificacionSolicitudEvento;
+import com.prestamosfacil.model.ReporteSolicitadoEvento;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -21,6 +22,7 @@ public class NotificacionEmailSender {
     private static final String CORREO_APROBADO_ASUNTO = "¡Tu préstamo fue aprobado!";
     private static final String CORREO_RECHAZADO_ASUNTO = "Resultado de tu solicitud de préstamo";
     private static final String CORREO_BIENVENIDA_ASUNTO = "¡Registro exitoso en Préstamos Fácil!";
+    private static final String CORREO_REPORTE_ASUNTO = "Reporte de préstamos aprobados";
     private static final String LOGO_PATH = "templates/images/logo.png";
     private static final String REMITENTE = "noreply@prestamosfacil.com";
 
@@ -88,6 +90,24 @@ public class NotificacionEmailSender {
         helper.setSubject(CORREO_BIENVENIDA_ASUNTO);
         helper.setText(html, true);
         helper.addInline("logo", new ClassPathResource(LOGO_PATH));
+
+        javaMailSender.send(mimeMessage);
+    }
+
+    public void enviarReportePorCorreo(ReporteSolicitadoEvento evento, byte[] pdf) throws MessagingException {
+        Context context = new Context();
+        context.setVariable("nombreAnalista", evento.destinatarioNombre());
+
+        String html = templateEngine.process("correo-reporte", context);
+
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+        helper.setFrom(REMITENTE);
+        helper.setTo(evento.destinatarioEmail());
+        helper.setSubject(CORREO_REPORTE_ASUNTO);
+        helper.setText(html, true);
+        helper.addInline("logo", new ClassPathResource(LOGO_PATH));
+        helper.addAttachment("reporte-prestamos-aprobados.pdf", new ByteArrayResource(pdf));
 
         javaMailSender.send(mimeMessage);
     }

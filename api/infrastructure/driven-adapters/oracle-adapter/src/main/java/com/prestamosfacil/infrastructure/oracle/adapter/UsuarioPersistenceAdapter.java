@@ -1,5 +1,6 @@
 package com.prestamosfacil.infrastructure.oracle.adapter;
 
+import com.prestamosfacil.enums.RolUsuario;
 import com.prestamosfacil.infrastructure.oracle.entity.UsuarioEntity;
 import com.prestamosfacil.infrastructure.oracle.mapper.UsuarioEntityMapper;
 import com.prestamosfacil.infrastructure.oracle.repository.ITipoDocumentoRepository;
@@ -9,6 +10,7 @@ import com.prestamosfacil.ports.IUsuarioPersistencePort;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -60,5 +62,12 @@ public class UsuarioPersistenceAdapter implements IUsuarioPersistencePort {
     @Override
     public boolean existeTipoDocumentoYNumeroDocumento(Long tipoDocumentoId, String numeroDocumento) {
         return usuarioRepository.existsByTipoDocumentoIdAndNumeroDocumento(tipoDocumentoId, numeroDocumento);
+    }
+
+    @Override
+    public List<Usuario> listarPorRol(RolUsuario rol) {
+        return usuarioRepository.findByRol(rol).stream()
+                .map(usuarioEntityMapper::toDomain)
+                .toList();
     }
 }

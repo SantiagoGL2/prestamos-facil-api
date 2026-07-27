@@ -1,7 +1,9 @@
 package com.prestamosfacil.ports;
 
+import com.prestamosfacil.enums.RolUsuario;
 import com.prestamosfacil.model.Usuario;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IUsuarioPersistencePort {
@@ -17,4 +19,6 @@ public interface IUsuarioPersistencePort {
     boolean existeEmail(String email);
 
     boolean existeTipoDocumentoYNumeroDocumento(Long tipoDocumentoId, String numeroDocumento);
+
+    List<Usuario> listarPorRol(RolUsuario rol);
 }
