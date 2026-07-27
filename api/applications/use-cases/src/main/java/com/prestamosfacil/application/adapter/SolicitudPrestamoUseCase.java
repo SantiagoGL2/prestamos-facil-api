@@ -2,6 +2,13 @@ package com.prestamosfacil.application.adapter;
 
 import com.prestamosfacil.application.port.ISolicitudPrestamoPort;
 import com.prestamosfacil.application.service.ProcesadorAprobacionSolicitud;
+import com.prestamosfacil.application.strategy.Aprobar;
+import com.prestamosfacil.application.strategy.DecisionEvaluacion;
+import com.prestamosfacil.application.strategy.EvaluacionAutomaticaStrategy;
+import com.prestamosfacil.application.strategy.EvaluacionManualStrategy;
+import com.prestamosfacil.application.strategy.EvaluacionPrestamoStrategy;
+import com.prestamosfacil.application.strategy.Rechazar;
+import com.prestamosfacil.application.strategy.RequerirRevisionManual;
 import com.prestamosfacil.application.validation.SolicitudPrestamoContexto;
 import com.prestamosfacil.application.validation.ValidadorMontoDentroDeRango;
 import com.prestamosfacil.application.validation.ValidadorPlazoDentroDeRango;
@@ -36,17 +43,23 @@ public class SolicitudPrestamoUseCase implements ISolicitudPrestamoPort {
     private final IUsuarioPersistencePort usuarioPersistencePort;
     private final ITipoPrestamoPersistencePort tipoPrestamoPersistencePort;
     private final ProcesadorAprobacionSolicitud procesadorAprobacionSolicitud;
+    private final EvaluacionAutomaticaStrategy evaluacionAutomaticaStrategy;
+    private final EvaluacionManualStrategy evaluacionManualStrategy;
     private final List<ValidadorSolicitud> validadores = List.of(new ValidadorTipoPrestamoActivo(),
             new ValidadorMontoDentroDeRango(), new ValidadorPlazoDentroDeRango());
 
     public SolicitudPrestamoUseCase(ISolicitudPrestamoPersistencePort solicitudPrestamoPersistencePort,
                                      IUsuarioPersistencePort usuarioPersistencePort,
                                      ITipoPrestamoPersistencePort tipoPrestamoPersistencePort,
-                                     ProcesadorAprobacionSolicitud procesadorAprobacionSolicitud) {
+                                     ProcesadorAprobacionSolicitud procesadorAprobacionSolicitud,
+                                     EvaluacionAutomaticaStrategy evaluacionAutomaticaStrategy,
+                                     EvaluacionManualStrategy evaluacionManualStrategy) {
         this.solicitudPrestamoPersistencePort = solicitudPrestamoPersistencePort;
         this.usuarioPersistencePort = usuarioPersistencePort;
         this.tipoPrestamoPersistencePort = tipoPrestamoPersistencePort;
         this.procesadorAprobacionSolicitud = procesadorAprobacionSolicitud;
+        this.evaluacionAutomaticaStrategy = evaluacionAutomaticaStrategy;
+        this.evaluacionManualStrategy = evaluacionManualStrategy;
     }
 
     @Override
@@ -63,7 +76,24 @@ public class SolicitudPrestamoUseCase implements ISolicitudPrestamoPort {
         SolicitudPrestamo solicitud = new SolicitudPrestamo(null, usuario, tipoPrestamo, monto, plazoMeses,
                 EstadoSolicitud.PENDIENTE_REVISION, null, LocalDateTime.now(), null);
 
-        return solicitudPrestamoPersistencePort.guardar(solicitud);
+        SolicitudPrestamo solicitudGuardada = solicitudPrestamoPersistencePort.guardar(solicitud);
+
+        EvaluacionPrestamoStrategy strategy = tipoPrestamo.validacionAutomatica()
+                ? evaluacionAutomaticaStrategy : evaluacionManualStrategy;
+
+        if (!tipoPrestamo.validacionAutomatica()) {
+            return solicitudGuardada;
+        }
+
+        DecisionEvaluacion decision = strategy.evaluar(solicitudGuardada);
+
+        return switch (decision) {
+            case Aprobar a -> procesadorAprobacionSolicitud.procesarAprobacion(solicitudGuardada, a.montoAprobado(),
+                    null);
+            case Rechazar r -> procesadorAprobacionSolicitud.procesarRechazo(solicitudGuardada, null);
+            case RequerirRevisionManual rm -> solicitudPrestamoPersistencePort.guardar(
+                    solicitudGuardada.conEstado(EstadoSolicitud.REVISION_MANUAL));
+        };
     }
 
     @Override
