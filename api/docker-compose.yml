@@ -5,9 +5,9 @@ services:
     ports:
       - "1521:1521"
     environment:
-      ORACLE_PASSWORD: oracle_pass
-      APP_USER: prestamos_user
-      APP_USER_PASSWORD: prestamos_pass
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      APP_USER: ${APP_USER}
+      APP_USER_PASSWORD: ${APP_USER_PASSWORD}
     volumes:
       - oracle_data:/opt/oracle/oradata
     healthcheck:
@@ -20,6 +20,9 @@ services:
   rabbitmq:
     image: rabbitmq:management
     container_name: prestamos-facil-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     ports:
       - "5672:5672"
       - "15672:15672"
