@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="docs/logo.png" alt="Préstamos Fácil" width="360"/>
-</p>
-
 <h1 align="center">Préstamos Fácil — API</h1>
 
 <p align="center">
@@ -25,7 +21,6 @@
 - [Usuario de prueba](#usuario-de-prueba)
 - [Endpoints](#endpoints)
 - [Pruebas unitarias](#pruebas-unitarias)
-- [Limitaciones conocidas](#limitaciones-conocidas)
 
 ---
 
@@ -46,7 +41,7 @@
 | Correo (pruebas)       | **Mailpit** — SMTP + UI web en `http://localhost:8025`             |
 | Generación de PDF      | **Thymeleaf** + **OpenHTMLtoPDF 1.0.10**                            |
 | Documentación API      | **springdoc-openapi 3.0.3** (Swagger UI)                            |
-| Cache                  | Spring Cache (`@Cacheable`), `ConcurrentMapCacheManager` en memoria — ver [Limitaciones](#limitaciones-conocidas) |
+| Cache                  | Spring Cache (`@Cacheable`), `ConcurrentMapCacheManager` en memoria  |
 | Pruebas                | JUnit 5 + Mockito                                                   |
 | Cálculo automático     | **Stored Procedure PL/SQL** (`sp_evaluar_prestamo_automatico`)     |
 
@@ -287,11 +282,3 @@ Cobertura por capa: casos de uso y estrategias de evaluación (`applications/use
 adaptadores de persistencia (`oracle-adapter`), publishers/listeners/generación de PDF
 (`rabbitmq-adapter`), y controllers/servicios/seguridad JWT (`entry-points`).
 
-## Limitaciones conocidas
-
-- **Cache sin Redis**: `@Cacheable` funciona (tipos de documento y de préstamo), pero con el
-  `CacheManager` en memoria por defecto de Spring, no con Redis — se intentó integrar Redis
-  pero presentó problemas durante el desarrollo y se dejó pendiente. El cache está desacoplado
-  del código de negocio, así que agregar Redis más adelante no requeriría tocar los casos de uso.
-- El registro de analistas requiere que ya exista un analista autenticado (para evitar que
-  cualquiera se autoasigne ese rol); por eso se siembra uno de prueba vía Flyway.
