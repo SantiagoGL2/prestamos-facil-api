@@ -9,8 +9,10 @@ import com.prestamosfacil.exception.EmailDuplicadoException;
 import com.prestamosfacil.exception.SolicitudInvalidaException;
 import com.prestamosfacil.exception.TipoDocumentoNoEncontradoException;
 import com.prestamosfacil.exception.UsuarioNoEncontradoException;
+import com.prestamosfacil.model.NotificacionRegistroEvento;
 import com.prestamosfacil.model.TipoDocumento;
 import com.prestamosfacil.model.Usuario;
+import com.prestamosfacil.ports.INotificacionPublisherPort;
 import com.prestamosfacil.ports.ITipoDocumentoPersistencePort;
 import com.prestamosfacil.ports.IUsuarioPersistencePort;
 
@@ -25,18 +27,35 @@ public class UsuarioUseCase implements IUsuarioPort {
 
     private final IUsuarioPersistencePort usuarioPersistencePort;
     private final ITipoDocumentoPersistencePort tipoDocumentoPersistencePort;
+    private final INotificacionPublisherPort notificacionPublisherPort;
     private final BCryptPasswordEncoder passwordEncoder =
             new BCryptPasswordEncoder(ConfiguracionSeguridadConstantes.FUERZA_HASH_PASSWORD);
 
     public UsuarioUseCase(IUsuarioPersistencePort usuarioPersistencePort,
-                           ITipoDocumentoPersistencePort tipoDocumentoPersistencePort) {
+                           ITipoDocumentoPersistencePort tipoDocumentoPersistencePort,
+                           INotificacionPublisherPort notificacionPublisherPort) {
         this.usuarioPersistencePort = usuarioPersistencePort;
         this.tipoDocumentoPersistencePort = tipoDocumentoPersistencePort;
+        this.notificacionPublisherPort = notificacionPublisherPort;
     }
 
     @Override
     public Usuario registrarUsuario(String nombres, String apellidos, String email, Long tipoDocumentoId,
                                      String numeroDocumento, BigDecimal salarioBase, String passwordPlano) {
+        return registrarConRol(nombres, apellidos, email, tipoDocumentoId, numeroDocumento, salarioBase,
+                passwordPlano, RolUsuario.CLIENTE);
+    }
+
+    @Override
+    public Usuario registrarAnalista(String nombres, String apellidos, String email, Long tipoDocumentoId,
+                                      String numeroDocumento, BigDecimal salarioBase, String passwordPlano) {
+        return registrarConRol(nombres, apellidos, email, tipoDocumentoId, numeroDocumento, salarioBase,
+                passwordPlano, RolUsuario.ANALISTA);
+    }
+
+    private Usuario registrarConRol(String nombres, String apellidos, String email, Long tipoDocumentoId,
+                                     String numeroDocumento, BigDecimal salarioBase, String passwordPlano,
+                                     RolUsuario rol) {
         TipoDocumento tipoDocumento = tipoDocumentoPersistencePort.buscarPorId(tipoDocumentoId)
                 .orElseThrow(() -> new TipoDocumentoNoEncontradoException(tipoDocumentoId));
 
@@ -55,9 +74,15 @@ public class UsuarioUseCase implements IUsuarioPort {
         }
 
         Usuario usuario = new Usuario(null, nombres, apellidos, email, tipoDocumento, numeroDocumento, salarioBase,
-                passwordEncoder.encode(passwordPlano), RolUsuario.CLIENTE, LocalDateTime.now());
+                passwordEncoder.encode(passwordPlano), rol, LocalDateTime.now());
 
-        return usuarioPersistencePort.guardar(usuario);
+        Usuario usuarioGuardado = usuarioPersistencePort.guardar(usuario);
+
+        notificacionPublisherPort.publicarUsuarioRegistrado(new NotificacionRegistroEvento(usuarioGuardado.id(),
+                usuarioGuardado.nombres() + " " + usuarioGuardado.apellidos(), usuarioGuardado.email(),
+                usuarioGuardado.rol().name()));
+
+        return usuarioGuardado;
     }
 
     @Override

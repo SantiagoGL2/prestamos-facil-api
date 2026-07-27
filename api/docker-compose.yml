@@ -17,5 +17,19 @@ services:
       retries: 20
       start_period: 30s
 
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: prestamos-facil-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: prestamos-facil-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
 volumes:
   oracle_data:

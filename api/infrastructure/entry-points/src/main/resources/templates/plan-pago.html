@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Plan de Pagos</title>
+  <style>
+    body { font-family: Arial, sans-serif; color: #333333; font-size: 12px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header img { width: 130px; }
+    h1 { color: #005a9c; font-size: 18px; }
+    .info-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+    .info-table td { padding: 4px 8px; }
+    .info-table .label { font-weight: bold; color: #005a9c; width: 180px; }
+    table.cuotas { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table.cuotas th { background-color: #005a9c; color: #ffffff; padding: 6px; text-align: right; font-size: 11px; }
+    table.cuotas th:first-child { text-align: center; }
+    table.cuotas td { padding: 5px 6px; border-bottom: 1px solid #e2e8f0; text-align: right; font-size: 11px; }
+    table.cuotas td:first-child { text-align: center; }
+    table.cuotas tr:nth-child(even) { background-color: #f8fafc; }
+    .footer { margin-top: 20px; font-size: 10px; color: #64748b; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img th:src="'data:image/png;base64,' + ${logoBase64}" alt="Préstamos Fácil"/>
+    <h1>Plan de Pagos</h1>
+  </div>
+  <table class="info-table">
+    <tr><td class="label">Cliente:</td><td th:text="${nombreUsuario}">Nombre</td></tr>
+    <tr><td class="label">Tipo de préstamo:</td><td th:text="${tipoPrestamoNombre}">Tipo</td></tr>
+    <tr><td class="label">Monto aprobado:</td><td th:text="${montoAprobado}">Monto</td></tr>
+    <tr><td class="label">Cuota mensual:</td><td th:text="${cuotaMensual}">Cuota</td></tr>
+  </table>
+  <table class="cuotas">
+    <thead>
+      <tr><th>N° Cuota</th><th>Cuota</th><th>Interés</th><th>Abono a Capital</th><th>Saldo Pendiente</th></tr>
+    </thead>
+    <tbody>
+      <tr th:each="cuota : ${cuotas}">
+        <td th:text="${cuota.numeroCuota()}">1</td>
+        <td th:text="${cuota.cuota()}">0</td>
+        <td th:text="${cuota.interes()}">0</td>
+        <td th:text="${cuota.abonoCapital()}">0</td>
+        <td th:text="${cuota.saldoPendiente()}">0</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="footer"><p>Préstamos Fácil © 2026 — Este documento es generado automáticamente.</p></div>
+</body>
+</html>

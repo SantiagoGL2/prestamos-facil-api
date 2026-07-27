@@ -1,5 +1,6 @@
 package com.prestamosfacil.controller;
 
+import com.prestamosfacil.dto.request.ActualizarEstadoSolicitudRequest;
 import com.prestamosfacil.dto.request.RegistrarSolicitudRequest;
 import com.prestamosfacil.dto.response.PaginaResponse;
 import com.prestamosfacil.dto.response.SolicitudPrestamoResponse;
@@ -13,6 +14,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,5 +63,14 @@ public class SolicitudPrestamoController {
                 fechaHasta, pagina, tamano);
 
         return ResponseEntity.ok(respuesta);
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<SolicitudPrestamoResponse> actualizarEstado(@PathVariable Long id,
+            @Valid @RequestBody ActualizarEstadoSolicitudRequest request) {
+        SolicitudPrestamo solicitud = solicitudPrestamoService.actualizarEstadoManual(id, request.nuevoEstado(),
+                request.analistaId());
+
+        return ResponseEntity.ok(SolicitudPrestamoResponse.from(solicitud));
     }
 }

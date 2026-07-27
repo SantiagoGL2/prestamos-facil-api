@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><title>Registro exitoso</title></head>
+<body style="margin: 0; padding: 0; background-color: #f6f9fc; font-family: Arial, sans-serif;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f6f9fc;">
+    <tr>
+      <td align="center" style="padding: 20px 0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          <tr>
+            <td align="center" style="padding: 30px 20px; background-color: #ffffff; border-bottom: 1px solid #f0f0f0;">
+              <img src="cid:logo" alt="Préstamos Fácil" width="150" style="display: block; border: 0; max-width: 100%; height: auto;">
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 40px 40px 30px 40px; color: #333333; line-height: 1.6;">
+              <h2 style="margin-top: 0; color: #1a1a1a; font-size: 22px; font-weight: bold;"
+                  th:text="'¡Hola ' + ${nombreUsuario} + '!'">¡Hola!</h2>
+              <p style="margin: 0 0 16px 0; font-size: 16px;">Tu registro en Préstamos Fácil se
+                completó exitosamente. Ya puedes iniciar sesión y comenzar a usar la plataforma.</p>
+              <p style="margin: 0 0 8px 0; font-size: 16px;">Si tú no realizaste este registro,
+                por favor responde directamente a este correo.</p>
+              <p style="margin: 25px 0 0 0; font-size: 16px;">Atentamente,<br>
+                <strong style="color: #1a1a1a;">Préstamos Fácil</strong></p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="background-color: #f1f5f9; padding: 25px; font-size: 12px; color: #64748b; line-height: 1.5;">
+              <p style="margin: 0 0 5px 0;">Este es un mensaje automático, por favor no lo respondas si no tienes dudas adicionales.</p>
+              <p style="margin: 0;">© 2026 Préstamos Fácil. Todos los derechos reservados.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -24,6 +24,13 @@ public class UsuarioService {
                 passwordPlano);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public Usuario registrarAnalista(String nombres, String apellidos, String email, Long tipoDocumentoId,
+                                      String numeroDocumento, BigDecimal salarioBase, String passwordPlano) {
+        return usuarioPort.registrarAnalista(nombres, apellidos, email, tipoDocumentoId, numeroDocumento,
+                salarioBase, passwordPlano);
+    }
+
     @Transactional(readOnly = true)
     public Usuario buscarPorId(Long id) {
         return usuarioPort.buscarPorId(id);

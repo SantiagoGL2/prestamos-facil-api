@@ -16,4 +16,6 @@ public interface ISolicitudPrestamoPort {
 
     ResultadoPaginado<SolicitudPrestamo> listarPorFecha(LocalDate fechaDesdeOpcional, LocalDate fechaHastaOpcional,
                                                          Paginacion paginacion);
+
+    SolicitudPrestamo actualizarEstadoManual(Long solicitudId, EstadoSolicitud nuevoEstado, Long analistaId);
 }

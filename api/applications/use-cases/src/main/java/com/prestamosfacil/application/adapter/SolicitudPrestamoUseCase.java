@@ -1,13 +1,16 @@
 package com.prestamosfacil.application.adapter;
 
 import com.prestamosfacil.application.port.ISolicitudPrestamoPort;
+import com.prestamosfacil.application.service.ProcesadorAprobacionSolicitud;
 import com.prestamosfacil.application.validation.SolicitudPrestamoContexto;
 import com.prestamosfacil.application.validation.ValidadorMontoDentroDeRango;
 import com.prestamosfacil.application.validation.ValidadorPlazoDentroDeRango;
 import com.prestamosfacil.application.validation.ValidadorSolicitud;
 import com.prestamosfacil.application.validation.ValidadorTipoPrestamoActivo;
 import com.prestamosfacil.enums.EstadoSolicitud;
+import com.prestamosfacil.enums.RolUsuario;
 import com.prestamosfacil.exception.SolicitudInvalidaException;
+import com.prestamosfacil.exception.SolicitudPrestamoNoEncontradaException;
 import com.prestamosfacil.exception.TipoPrestamoNoEncontradoException;
 import com.prestamosfacil.exception.UsuarioNoEncontradoException;
 import com.prestamosfacil.model.SolicitudPrestamo;
@@ -32,15 +35,18 @@ public class SolicitudPrestamoUseCase implements ISolicitudPrestamoPort {
     private final ISolicitudPrestamoPersistencePort solicitudPrestamoPersistencePort;
     private final IUsuarioPersistencePort usuarioPersistencePort;
     private final ITipoPrestamoPersistencePort tipoPrestamoPersistencePort;
+    private final ProcesadorAprobacionSolicitud procesadorAprobacionSolicitud;
     private final List<ValidadorSolicitud> validadores = List.of(new ValidadorTipoPrestamoActivo(),
             new ValidadorMontoDentroDeRango(), new ValidadorPlazoDentroDeRango());
 
     public SolicitudPrestamoUseCase(ISolicitudPrestamoPersistencePort solicitudPrestamoPersistencePort,
                                      IUsuarioPersistencePort usuarioPersistencePort,
-                                     ITipoPrestamoPersistencePort tipoPrestamoPersistencePort) {
+                                     ITipoPrestamoPersistencePort tipoPrestamoPersistencePort,
+                                     ProcesadorAprobacionSolicitud procesadorAprobacionSolicitud) {
         this.solicitudPrestamoPersistencePort = solicitudPrestamoPersistencePort;
         this.usuarioPersistencePort = usuarioPersistencePort;
         this.tipoPrestamoPersistencePort = tipoPrestamoPersistencePort;
+        this.procesadorAprobacionSolicitud = procesadorAprobacionSolicitud;
     }
 
     @Override
@@ -92,5 +98,32 @@ public class SolicitudPrestamoUseCase implements ISolicitudPrestamoPort {
         }
 
         return solicitudPrestamoPersistencePort.listarPorFecha(fechaDesdeOpcional, fechaHastaOpcional, paginacion);
+    }
+
+    @Override
+    public SolicitudPrestamo actualizarEstadoManual(Long solicitudId, EstadoSolicitud nuevoEstado, Long analistaId) {
+        SolicitudPrestamo solicitud = solicitudPrestamoPersistencePort.buscarPorId(solicitudId)
+                .orElseThrow(() -> new SolicitudPrestamoNoEncontradaException(solicitudId));
+
+        if (nuevoEstado != EstadoSolicitud.APROBADO && nuevoEstado != EstadoSolicitud.RECHAZADO) {
+            throw new SolicitudInvalidaException(
+                    "El estado manual solo puede ser APROBADO o RECHAZADO, se recibio: " + nuevoEstado);
+        }
+
+        if (solicitud.estado() != EstadoSolicitud.PENDIENTE_REVISION
+                && solicitud.estado() != EstadoSolicitud.REVISION_MANUAL) {
+            throw new SolicitudInvalidaException("La solicitud ya fue resuelta");
+        }
+
+        Usuario analista = usuarioPersistencePort.buscarPorId(analistaId)
+                .orElseThrow(() -> new UsuarioNoEncontradoException(analistaId));
+
+        if (analista.rol() != RolUsuario.ANALISTA) {
+            throw new SolicitudInvalidaException("El usuario indicado no tiene rol de analista");
+        }
+
+        return nuevoEstado == EstadoSolicitud.APROBADO
+                ? procesadorAprobacionSolicitud.procesarAprobacion(solicitud, solicitud.monto(), analistaId)
+                : procesadorAprobacionSolicitud.procesarRechazo(solicitud, analistaId);
     }
 }

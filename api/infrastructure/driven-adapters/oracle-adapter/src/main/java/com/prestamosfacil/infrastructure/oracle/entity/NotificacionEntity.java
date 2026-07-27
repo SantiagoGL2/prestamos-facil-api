@@ -42,7 +42,7 @@ public class NotificacionEntity {
     private UsuarioEntity usuario;
 
     @ManyToOne
-    @JoinColumn(name = "solicitud_id", nullable = false)
+    @JoinColumn(name = "solicitud_id")
     private SolicitudPrestamoEntity solicitud;
 
     @Column(name = "tipo", length = 30, nullable = false)

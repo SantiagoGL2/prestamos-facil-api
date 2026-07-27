@@ -13,4 +13,9 @@ public record SolicitudPrestamo(Long id, Usuario usuario, TipoPrestamo tipoPrest
         return new SolicitudPrestamo(id, usuario, tipoPrestamo, monto, plazoMeses, nuevo, analistaId,
                 fechaSolicitud, fechaResolucion);
     }
+
+    public SolicitudPrestamo resuelta(EstadoSolicitud nuevoEstado, Long analistaId) {
+        return new SolicitudPrestamo(id, usuario, tipoPrestamo, monto, plazoMeses, nuevoEstado, analistaId,
+                fechaSolicitud, LocalDateTime.now());
+    }
 }

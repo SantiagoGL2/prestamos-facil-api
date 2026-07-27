@@ -50,6 +50,11 @@ public class SolicitudPrestamoService {
         return mapearPagina(resultado);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public SolicitudPrestamo actualizarEstadoManual(Long solicitudId, EstadoSolicitud nuevoEstado, Long analistaId) {
+        return solicitudPrestamoPort.actualizarEstadoManual(solicitudId, nuevoEstado, analistaId);
+    }
+
     private PaginaResponse<SolicitudPrestamoResponse> mapearPagina(ResultadoPaginado<SolicitudPrestamo> resultado) {
         return new PaginaResponse<>(
                 resultado.contenido().stream().map(SolicitudPrestamoResponse::from).toList(),
