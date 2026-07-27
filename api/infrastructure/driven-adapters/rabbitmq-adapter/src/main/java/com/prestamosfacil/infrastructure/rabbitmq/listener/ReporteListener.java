@@ -10,6 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * Consume el evento de envío de reporte publicado (uno por cada analista destinatario),
+ * genera el PDF y lo envía por correo. Igual que {@link NotificacionListener}, atrapa
+ * cualquier excepción y solo la deja en el log sin relanzarla, para no provocar reintentos
+ * infinitos del mensaje ante un fallo de envío; a diferencia de los otros eventos, este no se
+ * persiste en la tabla {@code notificacion} porque esa tabla exige una solicitud asociada y
+ * el envío del reporte no está atado a ninguna.
+ */
 @Component
 public class ReporteListener {
 

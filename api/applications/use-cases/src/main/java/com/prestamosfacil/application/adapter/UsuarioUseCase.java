@@ -21,7 +21,14 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
+/**
+ * Registra y consulta usuarios. Un mismo agregado {@link Usuario} sirve tanto para clientes
+ * como para analistas — lo único que cambia entre {@link #registrarUsuario} y
+ * {@link #registrarAnalista} es el {@link RolUsuario} con el que se guarda, por eso ambos
+ * delegan en el mismo {@link #registrarConRol} en vez de duplicar las validaciones.
+ */
 @Service
 public class UsuarioUseCase implements IUsuarioPort {
 
@@ -53,6 +60,15 @@ public class UsuarioUseCase implements IUsuarioPort {
                 passwordPlano, RolUsuario.ANALISTA);
     }
 
+    /**
+     * Valida y guarda un usuario con el rol indicado. El salario se valida contra
+     * {@link ReglasNegocioConstantes#SALARIO_MINIMO}/{@code SALARIO_MAXIMO} para todos los
+     * roles por igual (incluyendo analistas) porque el campo es el mismo que después usa el
+     * Stored Procedure de evaluación automática para calcular capacidad de endeudamiento — un
+     * salario fuera de rango ahí produciría resultados sin sentido más adelante, así que se
+     * corta en el registro. Al final publica el evento de bienvenida de forma asíncrona; el
+     * fallo de ese envío no revierte el registro del usuario.
+     */
     private Usuario registrarConRol(String nombres, String apellidos, String email, Long tipoDocumentoId,
                                      String numeroDocumento, BigDecimal salarioBase, String passwordPlano,
                                      RolUsuario rol) {
@@ -95,5 +111,15 @@ public class UsuarioUseCase implements IUsuarioPort {
     public Usuario buscarPorTipoDocumentoYNumeroDocumento(Long tipoDocumentoId, String numeroDocumento) {
         return usuarioPersistencePort.buscarPorTipoDocumentoYNumeroDocumento(tipoDocumentoId, numeroDocumento)
                 .orElseThrow(() -> new UsuarioNoEncontradoException(tipoDocumentoId, numeroDocumento));
+    }
+
+    @Override
+    public List<Usuario> listarClientes() {
+        return usuarioPersistencePort.listarPorRol(RolUsuario.CLIENTE);
+    }
+
+    @Override
+    public List<Usuario> listarAnalistas() {
+        return usuarioPersistencePort.listarPorRol(RolUsuario.ANALISTA);
     }
 }

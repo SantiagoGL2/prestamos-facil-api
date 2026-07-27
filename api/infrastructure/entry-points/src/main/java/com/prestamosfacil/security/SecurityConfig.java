@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/solicitudes-prestamo/**").hasRole("ANALISTA")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/solicitudes-prestamo/**").hasRole("ANALISTA")
                         .requestMatchers(HttpMethod.POST, "/api/v1/analistas").hasRole("ANALISTA")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/analistas").hasRole("ANALISTA")
                         .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/**").hasRole("ANALISTA")
                         .requestMatchers("/api/v1/reportes/**").hasRole("ANALISTA")
                         .anyRequest().authenticated())

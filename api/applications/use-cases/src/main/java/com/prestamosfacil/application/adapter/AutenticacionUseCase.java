@@ -8,6 +8,11 @@ import com.prestamosfacil.ports.IUsuarioPersistencePort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Valida credenciales de login. Deliberadamente lanza el mismo mensaje genérico tanto si el
+ * email no existe como si la contraseña no coincide — distinguir esos dos casos en la respuesta
+ * permitiría a un atacante enumerar qué emails están registrados en el sistema.
+ */
 @Service
 public class AutenticacionUseCase implements IAutenticacionPort {
 

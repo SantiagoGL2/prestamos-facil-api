@@ -16,6 +16,12 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Genera el reporte global de préstamos aprobados y coordina su envío por correo. El envío no
+ * va a un destinatario puntual: se resuelve la lista completa de usuarios con rol
+ * {@code ANALISTA} y se publica un evento independiente por cada uno, para que el fallo de un
+ * envío no afecte a los demás.
+ */
 @Service
 public class ReporteUseCase implements IReportePort {
 

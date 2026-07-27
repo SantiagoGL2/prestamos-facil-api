@@ -9,6 +9,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Consulta el catálogo de tipos de documento. Es de solo lectura y prácticamente estático, por
+ * eso {@link #listarActivos()} está cacheado — no hay altas/bajas expuestas por la API que
+ * requieran invalidar ese cache.
+ */
 @Service
 public class TipoDocumentoUseCase implements ITipoDocumentoPort {
 

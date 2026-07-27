@@ -14,6 +14,15 @@ import java.math.BigDecimal;
 import java.sql.Types;
 import java.util.Map;
 
+/**
+ * Único punto de la aplicación que invoca {@code sp_evaluar_prestamo_automatico}. El contrato
+ * del procedure es: recibe {@code p_solicitud_id} (IN) y retorna cinco parámetros OUT —
+ * {@code p_estado_resultante} ({@code VARCHAR2}: "APROBADO"/"RECHAZADO"/"REVISION_MANUAL") y
+ * cuatro montos de apoyo ({@code p_capacidad_maxima}, {@code p_deuda_actual},
+ * {@code p_capacidad_disponible}, {@code p_cuota_nueva}), todos {@code NUMBER}. La lógica de
+ * negocio que decide el estado vive enteramente en PL/SQL; esta clase solo mapea el resultado
+ * a {@link ResultadoEvaluacionAutomatica}, no reinterpreta ni valida los números.
+ */
 @Component
 public class EvaluacionAutomaticaProcedureAdapter implements IEvaluacionAutomaticaPort {
 

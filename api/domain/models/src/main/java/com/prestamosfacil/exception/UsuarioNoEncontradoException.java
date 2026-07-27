@@ -1,5 +1,9 @@
 package com.prestamosfacil.exception;
 
+/**
+ * Se lanza cuando no se encuentra un usuario, ya sea por id (por ejemplo, al validar el
+ * analista de una solicitud) o por la combinación tipo + número de documento.
+ */
 public class UsuarioNoEncontradoException extends DomainException {
 
     public UsuarioNoEncontradoException(Long id) {

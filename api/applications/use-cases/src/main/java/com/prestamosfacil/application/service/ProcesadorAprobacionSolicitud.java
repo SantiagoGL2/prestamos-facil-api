@@ -19,6 +19,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Concentra la lógica de "qué pasa cuando una solicitud queda aprobada o rechazada": calcular
+ * la cuota, generar préstamo y plan de pagos, actualizar el estado de la solicitud, y publicar
+ * la notificación. Vive separada de los casos de uso porque exactamente el mismo procesamiento
+ * lo dispara tanto la resolución manual de un analista ({@code SolicitudPrestamoUseCase}) como
+ * la evaluación automática vía Stored Procedure — duplicarla en ambos flujos habría sido fácil
+ * de desincronizar a futuro.
+ */
 @Service
 public class ProcesadorAprobacionSolicitud {
 

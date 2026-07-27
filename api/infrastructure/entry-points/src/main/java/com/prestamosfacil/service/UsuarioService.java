@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class UsuarioService {
@@ -39,5 +40,15 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public Usuario buscarPorTipoDocumentoYNumeroDocumento(Long tipoDocumentoId, String numeroDocumento) {
         return usuarioPort.buscarPorTipoDocumentoYNumeroDocumento(tipoDocumentoId, numeroDocumento);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Usuario> listarClientes() {
+        return usuarioPort.listarClientes();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Usuario> listarAnalistas() {
+        return usuarioPort.listarAnalistas();
     }
 }

@@ -3,6 +3,7 @@ package com.prestamosfacil.application.port;
 import com.prestamosfacil.model.Usuario;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface IUsuarioPort {
 
@@ -15,4 +16,8 @@ public interface IUsuarioPort {
     Usuario buscarPorId(Long id);
 
     Usuario buscarPorTipoDocumentoYNumeroDocumento(Long tipoDocumentoId, String numeroDocumento);
+
+    List<Usuario> listarClientes();
+
+    List<Usuario> listarAnalistas();
 }

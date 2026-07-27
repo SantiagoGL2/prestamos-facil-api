@@ -6,6 +6,11 @@ import com.prestamosfacil.model.Usuario;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Puerto de persistencia para usuarios, sin distinguir en la firma entre rol CLIENTE y
+ * ANALISTA — ambos son el mismo agregado de dominio, la diferencia de rol se filtra en tiempo
+ * de consulta (ver {@link #listarPorRol(com.prestamosfacil.enums.RolUsuario)}).
+ */
 public interface IUsuarioPersistencePort {
 
     Usuario guardar(Usuario usuario);

@@ -36,6 +36,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Orquesta el ciclo de vida completo de una solicitud de préstamo: registro (con evaluación
+ * automática opcional), consulta paginada por estado/fecha, y resolución manual por un
+ * analista. Es el único punto de la app que decide si una solicitud pasa por el flujo
+ * automático o queda esperando a un humano.
+ */
 @Service
 public class SolicitudPrestamoUseCase implements ISolicitudPrestamoPort {
 
@@ -62,6 +68,26 @@ public class SolicitudPrestamoUseCase implements ISolicitudPrestamoPort {
         this.evaluacionManualStrategy = evaluacionManualStrategy;
     }
 
+    /**
+     * Registra la solicitud en {@code PENDIENTE_REVISION} y, solo si el tipo de préstamo tiene
+     * la validación automática habilitada ({@link TipoPrestamo#validacionAutomatica()}),
+     * dispara de inmediato la evaluación contra el Stored Procedure. Si el tipo de préstamo no
+     * la tiene habilitada, la solicitud se deja tal cual — no tiene sentido evaluar
+     * automáticamente algo que el negocio marcó explícitamente como "siempre requiere un
+     * humano".
+     * <p>
+     * Cuando sí se evalúa, la {@link DecisionEvaluacion} resultante se resuelve así:
+     * <ul>
+     *   <li>{@link Aprobar}: se delega en {@link ProcesadorAprobacionSolicitud} para generar el
+     *       préstamo, el plan de pagos y la notificación — igual que si lo aprobara un analista,
+     *       pero con {@code analistaId = null} porque la decisión la tomó el sistema.</li>
+     *   <li>{@link Rechazar}: mismo procesador, pero sin préstamo ni plan de pagos.</li>
+     *   <li>{@link RequerirRevisionManual}: no se genera nada todavía, solo se persiste el
+     *       estado {@code REVISION_MANUAL} para que quede claro que el sistema ya la miró y
+     *       decidió que necesita un analista (distinto de {@code PENDIENTE_REVISION}, que
+     *       significa que nadie la ha mirado todavía).</li>
+     * </ul>
+     */
     @Override
     public SolicitudPrestamo registrarSolicitud(Long usuarioId, Long tipoPrestamoId, BigDecimal monto,
                                                  int plazoMeses) {
@@ -130,6 +156,16 @@ public class SolicitudPrestamoUseCase implements ISolicitudPrestamoPort {
         return solicitudPrestamoPersistencePort.listarPorFecha(fechaDesdeOpcional, fechaHastaOpcional, paginacion);
     }
 
+    /**
+     * Resuelve manualmente una solicitud. Antes de delegar en
+     * {@link ProcesadorAprobacionSolicitud}, valida tres cosas en orden: (1) que el estado
+     * destino solo sea {@code APROBADO} o {@code RECHAZADO} — nada más tiene sentido como
+     * resolución manual; (2) que la solicitud siga en un estado resoluble
+     * ({@code PENDIENTE_REVISION} o {@code REVISION_MANUAL}), para no volver a resolver algo ya
+     * cerrado; y (3) que el {@code analistaId} recibido corresponda a un usuario que exista y
+     * que tenga específicamente rol {@code ANALISTA} — esto último evita que un cliente (o un
+     * id inventado) resuelva solicitudes solo porque conoce un id de usuario válido.
+     */
     @Override
     public SolicitudPrestamo actualizarEstadoManual(Long solicitudId, EstadoSolicitud nuevoEstado, Long analistaId) {
         SolicitudPrestamo solicitud = solicitudPrestamoPersistencePort.buscarPorId(solicitudId)

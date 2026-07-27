@@ -15,6 +15,15 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+/**
+ * Consume los eventos de notificación publicados por {@code INotificacionPublisherPort}:
+ * resolución de una solicitud (aprobada/rechazada) y registro exitoso de un usuario. Cada
+ * método atrapa cualquier excepción del envío de correo y la registra como notificación
+ * {@code FALLIDA} en vez de relanzarla — si se relanzara, Spring AMQP reintentaría el mensaje
+ * indefinidamente (o lo movería a una dead-letter queue inexistente), y un correo que sigue
+ * fallando (ej. SMTP caído) terminaría reintentándose para siempre en vez de quedar registrado
+ * una sola vez para que alguien lo revise.
+ */
 @Component
 public class NotificacionListener {
 

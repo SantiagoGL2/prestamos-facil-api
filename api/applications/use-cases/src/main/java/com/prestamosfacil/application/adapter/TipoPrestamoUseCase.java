@@ -10,6 +10,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Consulta el catálogo de tipos de préstamo (tasas, rangos de monto/plazo y si tiene
+ * validación automática habilitada). Al igual que tipo de documento, {@link #listarActivos()}
+ * está cacheado por ser un catálogo que casi no cambia.
+ */
 @Service
 public class TipoPrestamoUseCase implements ITipoPrestamoPort {
 
