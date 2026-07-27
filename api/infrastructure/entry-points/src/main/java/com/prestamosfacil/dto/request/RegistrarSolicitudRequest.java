@@ -7,9 +7,6 @@ import java.math.BigDecimal;
 
 public record RegistrarSolicitudRequest(
 
-        @NotNull(message = "El usuario es obligatorio")
-        Long usuarioId,
-
         @NotNull(message = "El tipo de prestamo es obligatorio")
         Long tipoPrestamoId,
 

@@ -30,3 +30,7 @@ spring:
 
 server:
   port: 8080
+
+jwt:
+  secret: dGhpcy1pcy1hLXZlcnktbG9uZy1yYW5kb20tYmFzZTY0LXNlY3JldC1mb3ItcHJlc3RhbW9zLWZhY2lsLWp3dA==
+  expiracion-ms: 3600000

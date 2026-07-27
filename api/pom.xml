@@ -28,7 +28,6 @@
         <module>applications/use-cases</module>
         <module>infrastructure/driven-adapters/oracle-adapter</module>
         <module>infrastructure/driven-adapters/rabbitmq-adapter</module>
-        <module>infrastructure/driven-adapters/redis-adapter</module>
         <module>infrastructure/entry-points</module>
     </modules>
 </project>

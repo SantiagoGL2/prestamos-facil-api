@@ -1,5 +1,6 @@
 package com.prestamosfacil.exceptionHandler;
 
+import com.prestamosfacil.exception.CredencialesInvalidasException;
 import com.prestamosfacil.exception.DocumentoDuplicadoException;
 import com.prestamosfacil.exception.EmailDuplicadoException;
 import com.prestamosfacil.exception.SolicitudInvalidaException;
@@ -37,6 +38,12 @@ public class ControllerAdvisor {
     @ExceptionHandler(SolicitudInvalidaException.class)
     public ResponseEntity<ErrorResponse> handleSolicitudInvalida(SolicitudInvalidaException ex, WebRequest request) {
         return construirRespuesta(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(CredencialesInvalidasException.class)
+    public ResponseEntity<ErrorResponse> handleCredencialesInvalidas(CredencialesInvalidasException ex,
+                                                                      WebRequest request) {
+        return construirRespuesta(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

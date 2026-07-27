@@ -6,6 +6,7 @@ import com.prestamosfacil.dto.response.PaginaResponse;
 import com.prestamosfacil.dto.response.SolicitudPrestamoResponse;
 import com.prestamosfacil.enums.EstadoSolicitud;
 import com.prestamosfacil.model.SolicitudPrestamo;
+import com.prestamosfacil.security.UsuarioAutenticado;
 import com.prestamosfacil.service.SolicitudPrestamoService;
 
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,8 +37,9 @@ public class SolicitudPrestamoController {
     }
 
     @PostMapping
-    public ResponseEntity<SolicitudPrestamoResponse> registrar(@Valid @RequestBody RegistrarSolicitudRequest request) {
-        SolicitudPrestamo solicitud = solicitudPrestamoService.registrarSolicitud(request.usuarioId(),
+    public ResponseEntity<SolicitudPrestamoResponse> registrar(@Valid @RequestBody RegistrarSolicitudRequest request,
+            @AuthenticationPrincipal UsuarioAutenticado principal) {
+        SolicitudPrestamo solicitud = solicitudPrestamoService.registrarSolicitud(principal.getId(),
                 request.tipoPrestamoId(), request.monto(), request.plazoMeses());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(SolicitudPrestamoResponse.from(solicitud));
@@ -67,9 +70,10 @@ public class SolicitudPrestamoController {
 
     @PatchMapping("/{id}/estado")
     public ResponseEntity<SolicitudPrestamoResponse> actualizarEstado(@PathVariable Long id,
-            @Valid @RequestBody ActualizarEstadoSolicitudRequest request) {
+            @Valid @RequestBody ActualizarEstadoSolicitudRequest request,
+            @AuthenticationPrincipal UsuarioAutenticado principal) {
         SolicitudPrestamo solicitud = solicitudPrestamoService.actualizarEstadoManual(id, request.nuevoEstado(),
-                request.analistaId());
+                principal.getId());
 
         return ResponseEntity.ok(SolicitudPrestamoResponse.from(solicitud));
     }
